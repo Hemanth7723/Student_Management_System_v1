@@ -146,6 +146,145 @@ Update `application.properties`
 
 ------------------------------------------------------------------------
 
+# Docker Setup
+
+Each microservice can be containerized using Docker.
+
+## Build JAR Files
+
+Before building Docker images, build the services.
+
+```
+./gradlew clean build
+```
+
+JAR will be generated inside
+
+```
+build/libs/
+```
+
+---
+
+# Docker Compose (Recommended)
+
+Create `docker-compose.yml`
+
+```
+version: "3.8"
+
+services:
+```
+
+Run everything
+
+```
+docker compose up --build
+```
+
+---
+
+# Deploying to Render
+
+The services can be deployed individually on Render.
+
+## Step 1 — Push Code to GitHub
+
+Push your repository to GitHub.
+
+Example
+
+```
+Student_Management_System_v1
+```
+
+---
+
+## Step 2 — Create Render Account
+
+Visit
+
+```
+https://render.com
+```
+
+Login with GitHub.
+
+---
+
+# Deploy Eureka Server
+
+Create a new **Web Service**
+
+Configuration
+
+```
+Name: sms-eureka-server
+Environment: Docker
+Root Directory: eureka-server
+Branch: main
+```
+
+Deploy.
+
+---
+
+# Deploy Student Service
+
+Create another **Web Service**
+
+Configuration
+
+```
+Name: sms-student-service
+Environment: Docker
+Root Directory: student-service
+Branch: main
+```
+
+Environment Variable
+
+```
+EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=https://sms-eureka-server.onrender.com/eureka/
+```
+
+Deploy.
+
+---
+
+# Deploy API Gateway
+
+Create another **Web Service**
+
+Configuration
+
+```
+Name: sms-api-gateway
+Environment: Docker
+Root Directory: api-gateway
+Branch: main
+```
+
+Environment Variable
+
+```
+EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=https://sms-eureka-server.onrender.com/eureka/
+```
+
+Deploy.
+
+---
+
+# Access the Application
+
+Once deployed, access APIs via gateway
+
+```
+https://sms-api-gateway.onrender.com/api/students
+```
+
+---
+
 ## Project Structure
 
     student-management-system
@@ -181,3 +320,12 @@ Update `application.properties`
   API Gateway       8080
   Student Service   8081
   H2 Console        8081 (/h2-console)
+
+---
+
+# Future Improvements
+
+- Replace H2 with MySQL/PostgreSQL
+- Add authentication (JWT)
+- Implement CI/CD pipelines
+- Add monitoring (Prometheus + Grafana)
