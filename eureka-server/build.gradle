@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.sms'
+version = '1.0.0'
+description = 'eureka server - Student Management System'
+
+java {
+    sourceCompatibility = '17'
+}
+
+ext {
+    set('springCloudVersion', "2023.0.1")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // Eureka Server
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

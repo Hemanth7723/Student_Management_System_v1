@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Management System</title>
+  <style>
+    /* ── Reset & Base ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1a56db 0%, #0e3fa3 100%);
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: .5px; }
+    header span { font-size: .85rem; opacity: .8; }
+
+    /* ── Layout ─────────────────────────────────────────────────────────── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+
+    /* ── Notification banner ─────────────────────────────────────────────── */
+    #notification {
+      display: none;
+      padding: 12px 18px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      font-size: .92rem;
+    }
+    #notification.success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+    #notification.error   { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+
+    /* ── Cards ───────────────────────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.1);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a56db;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* ── Form grid ───────────────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: .82rem; font-weight: 600; color: #4a5568; }
+    .form-group input {
+      padding: 9px 12px;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: .9rem;
+      transition: border-color .2s;
+      outline: none;
+    }
+    .form-group input:focus { border-color: #1a56db; }
+    .form-group input.error-input { border-color: #ef4444; }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────── */
+    .btn-row { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+    button {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+    button:active { transform: scale(.97); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-primary   { background: #1a56db; color: #fff; }
+    .btn-secondary { background: #e2e8f0; color: #2d3748; }
+    .btn-danger    { background: #ef4444; color: #fff; }
+    .btn-warning   { background: #f59e0b; color: #fff; }
+    .btn-sm        { padding: 5px 12px; font-size: .8rem; }
+
+    /* ── Search bar ──────────────────────────────────────────────────────── */
+    .search-bar { display: flex; gap: 10px; margin-bottom: 18px; }
+    .search-bar input {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: .9rem;
+      outline: none;
+    }
+    .search-bar input:focus { border-color: #1a56db; }
+
+    /* ── Stats row ───────────────────────────────────────────────────────── */
+    .stats { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .stat-box {
+      flex: 1; min-width: 130px;
+      background: #ebf5ff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+    }
+    .stat-box .stat-num  { font-size: 1.8rem; font-weight: 800; color: #1a56db; }
+    .stat-box .stat-lbl  { font-size: .78rem; color: #4a5568; margin-top: 2px; }
+
+    /* ── Table ───────────────────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th {
+      background: #1a56db;
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+    tr:hover td { background: #f7faff; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 30px;
+      font-size: .75rem;
+      font-weight: 600;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* ── Empty / loading states ──────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #718096;
+    }
+    .spinner {
+      display: inline-block;
+      width: 28px; height: 28px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #1a56db;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin-bottom: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Modal overlay ───────────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 10px;
+      padding: 28px;
+      width: min(480px, 95vw);
+      box-shadow: 0 10px 40px rgba(0,0,0,.3);
+    }
+    .modal h3 { margin-bottom: 16px; color: #1a56db; }
+    .modal-actions { margin-top: 18px; display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── API endpoint reference (for Postman) ────────────────────────────── */
+    .api-table td, .api-table th { padding: 8px 12px; }
+    .method { font-weight: 700; font-family: monospace; }
+    .method.get    { color: #047857; }
+    .method.post   { color: #1a56db; }
+    .method.put    { color: #d97706; }
+    .method.delete { color: #dc2626; }
+    .endpoint { font-family: monospace; font-size: .82rem; color: #374151; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: .82rem; }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────────────────────── -->
+<header>
+  <div>
+    <h1>🎓 Student Management System</h1>
+    <span>RESTful API · Spring Boot · Microservices</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Notification -->
+  <div id="notification"></div>
+
+  <!-- ── Stats ─────────────────────────────────────────────────────────────── -->
+  <div class="stats">
+    <div class="stat-box">
+      <div class="stat-num" id="totalCount">—</div>
+      <div class="stat-lbl">Total Students</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="apiStatus">⏳</div>
+      <div class="stat-lbl">API Gateway</div>
+    </div>
+  </div>
+
+  <!-- ── Add / Edit Student Form ───────────────────────────────────────────── -->
+  <div class="card">
+    <h2 id="formTitle">➕ Add New Student</h2>
+    <input type="hidden" id="editId" />
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="name">Full Name *</label>
+        <input id="name" type="text" placeholder="e.g. Alice Johnson" />
+      </div>
+      <div class="form-group">
+        <label for="age">Age *</label>
+        <input id="age" type="number" placeholder="e.g. 21" min="1" max="120" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address *</label>
+        <input id="email" type="email" placeholder="e.g. alice@example.com" />
+      </div>
+      <div class="form-group">
+        <label for="course">Course *</label>
+        <input id="course" type="text" placeholder="e.g. Computer Science" />
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary"   onclick="submitForm()">💾 Save Student</button>
+      <button class="btn-secondary" onclick="resetForm()">✖ Cancel</button>
+    </div>
+  </div>
+
+  <!-- ── Student List ──────────────────────────────────────────────────────── -->
+  <div class="card">
+    <h2>📋 Student List</h2>
+
+    <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="Search by name, email, or course…" />
+      <button class="btn-primary"   onclick="searchStudents()">🔍 Search</button>
+      <button class="btn-secondary" onclick="loadStudents()">⟳ Reset</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="studentTableBody">
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="spinner"></div><br/>Loading students…
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── API Reference (Postman guide) ─────────────────────────────────────── -->
+  <div class="card">
+    <h2>📡 API Endpoints (Postman Reference)</h2>
+    <p style="font-size:.85rem;color:#4a5568;margin-bottom:14px;">
+      All requests go through the <strong>API Gateway</strong> on
+      <code>http://localhost:8080</code>. The gateway strips <code>/api</code>
+      and forwards to the Student Service on port <strong>8081</strong>.
+    </p>
+    <div class="table-wrap">
+      <table class="api-table">
+        <thead>
+          <tr><th>Method</th><th>URL</th><th>Description</th><th>Body</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method get">GET</span></td>
+            <td class="endpoint">http://localhost:8080/api/students</td>
+            <td>Get all students</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="method get">GET</span></td>
+            <td class="endpoint">http://localhost:8080/api/students/{id}</td>
+            <td>Get student by ID</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="method get">GET</span></td>
+            <td class="endpoint">http://localhost:8080/api/students/search?q=Alice</td>
+            <td>Search students</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="method post">POST</span></td>
+            <td class="endpoint">http://localhost:8080/api/students</td>
+            <td>Add new student</td>
+            <td><code>JSON body</code></td>
+          </tr>
+          <tr>
+            <td><span class="method put">PUT</span></td>
+            <td class="endpoint">http://localhost:8080/api/students/{id}</td>
+            <td>Update student</td>
+            <td><code>JSON body</code></td>
+          </tr>
+          <tr>
+            <td><span class="method delete">DELETE</span></td>
+            <td class="endpoint">http://localhost:8080/api/students/{id}</td>
+            <td>Delete student</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.82rem;color:#718096;margin-top:12px;">
+      <strong>Sample POST/PUT body:</strong><br/>
+      <code>{ "name": "John Doe", "age": 21, "email": "john@example.com", "course": "Computer Science" }</code>
+    </p>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ── Delete Confirm Modal ─────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>⚠️ Confirm Delete</h3>
+    <p>Are you sure you want to delete this student? This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-danger"    id="confirmDeleteBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── JavaScript ───────────────────────────────────────────────────────────── -->
+<script>
+  // ── Configuration ───────────────────────────────────────────────────────────
+  // All requests go through the API Gateway.
+  // Change BASE_URL if your gateway runs on a different port.
+  const BASE_URL = 'http://localhost:8080/api/students';
+
+  // ── Utility: show notification banner ──────────────────────────────────────
+  function notify(message, type = 'success') {
+    const el = document.getElementById('notification');
+    el.textContent = message;
+    el.className   = type;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+  }
+
+  // ── Utility: generic fetch wrapper ─────────────────────────────────────────
+  async function apiFetch(url, options = {}) {
+    const defaults = {
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+    };
+    const res = await fetch(url, { ...defaults, ...options,
+      headers: { ...defaults.headers, ...(options.headers || {}) } });
+    const json = await res.json();
+    if (!res.ok || json.success === false) {
+      throw new Error(json.message || `HTTP ${res.status}`);
+    }
+    return json;
+  }
+
+  // ── Load all students ───────────────────────────────────────────────────────
+  async function loadStudents() {
+    document.getElementById('searchInput').value = '';
+    setTableLoading();
+    try {
+      const json = await apiFetch(BASE_URL);
+      renderTable(json.data || []);
+      document.getElementById('totalCount').textContent = (json.data || []).length;
+      document.getElementById('apiStatus').textContent  = '✅';
+    } catch (err) {
+      document.getElementById('apiStatus').textContent = '❌';
+      renderTableError('Could not connect to API Gateway. Is the backend running?');
+    }
+  }
+
+  // ── Search students ─────────────────────────────────────────────────────────
+  async function searchStudents() {
+    const q = document.getElementById('searchInput').value.trim();
+    setTableLoading();
+    try {
+      const url  = q ? `${BASE_URL}/search?q=${encodeURIComponent(q)}` : BASE_URL;
+      const json = await apiFetch(url);
+      renderTable(json.data || []);
+    } catch (err) {
+      renderTableError(err.message);
+    }
+  }
+
+  // ── Render table rows ───────────────────────────────────────────────────────
+  function renderTable(students) {
+    const tbody = document.getElementById('studentTableBody');
+    if (!students.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No students found.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = students.map(s => `
+      <tr>
+        <td>${s.id}</td>
+        <td><strong>${escHtml(s.name)}</strong></td>
+        <td>${s.age}</td>
+        <td>${escHtml(s.email)}</td>
+        <td><span class="badge">${escHtml(s.course)}</span></td>
+        <td>
+          <button class="btn-warning btn-sm" onclick="editStudent(${s.id},'${escAttr(s.name)}',${s.age},'${escAttr(s.email)}','${escAttr(s.course)}')">✏️ Edit</button>
+          <button class="btn-danger  btn-sm" style="margin-left:6px" onclick="openDeleteModal(${s.id})">🗑 Delete</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function setTableLoading() {
+    document.getElementById('studentTableBody').innerHTML =
+      `<tr><td colspan="6" class="empty-state"><div class="spinner"></div><br/>Loading…</td></tr>`;
+  }
+
+  function renderTableError(msg) {
+    document.getElementById('studentTableBody').innerHTML =
+      `<tr><td colspan="6" class="empty-state" style="color:#dc2626">⚠️ ${escHtml(msg)}</td></tr>`;
+  }
+
+  // ── Submit form (Add or Update) ─────────────────────────────────────────────
+  async function submitForm() {
+    const id     = document.getElementById('editId').value;
+    const name   = document.getElementById('name').value.trim();
+    const age    = parseInt(document.getElementById('age').value);
+    const email  = document.getElementById('email').value.trim();
+    const course = document.getElementById('course').value.trim();
+
+    // Basic client-side validation
+    if (!name || !email || !course || isNaN(age)) {
+      notify('All fields are required.', 'error'); return;
+    }
+
+    const body = JSON.stringify({ name, age, email, course });
+
+    try {
+      if (id) {
+        // UPDATE
+        await apiFetch(`${BASE_URL}/${id}`, { method: 'PUT', body });
+        notify(`Student #${id} updated successfully!`);
+      } else {
+        // CREATE
+        await apiFetch(BASE_URL, { method: 'POST', body });
+        notify('New student added successfully!');
+      }
+      resetForm();
+      loadStudents();
+    } catch (err) {
+      notify(err.message, 'error');
+    }
+  }
+
+  // ── Populate form for editing ───────────────────────────────────────────────
+  function editStudent(id, name, age, email, course) {
+    document.getElementById('editId').value   = id;
+    document.getElementById('name').value     = name;
+    document.getElementById('age').value      = age;
+    document.getElementById('email').value    = email;
+    document.getElementById('course').value   = course;
+    document.getElementById('formTitle').textContent = `✏️ Edit Student #${id}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Reset form to Add mode ──────────────────────────────────────────────────
+  function resetForm() {
+    ['editId','name','age','email','course'].forEach(id =>
+      document.getElementById(id).value = '');
+    document.getElementById('formTitle').textContent = '➕ Add New Student';
+  }
+
+  // ── Delete modal ────────────────────────────────────────────────────────────
+  let pendingDeleteId = null;
+
+  function openDeleteModal(id) {
+    pendingDeleteId = id;
+    document.getElementById('deleteModal').classList.add('open');
+    document.getElementById('confirmDeleteBtn').onclick = confirmDelete;
+  }
+
+  function closeDeleteModal() {
+    pendingDeleteId = null;
+    document.getElementById('deleteModal').classList.remove('open');
+  }
+
+  async function confirmDelete() {
+    if (!pendingDeleteId) return;
+    try {
+      await apiFetch(`${BASE_URL}/${pendingDeleteId}`, { method: 'DELETE' });
+      notify(`Student #${pendingDeleteId} deleted.`);
+      closeDeleteModal();
+      loadStudents();
+    } catch (err) {
+      notify(err.message, 'error');
+      closeDeleteModal();
+    }
+  }
+
+  // ── Escape helpers ──────────────────────────────────────────────────────────
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function escAttr(s) {
+    return String(s).replace(/'/g,"\\'");
+  }
+
+  // ── Search on Enter key ─────────────────────────────────────────────────────
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') searchStudents();
+  });
+
+  // ── Initial load ────────────────────────────────────────────────────────────
+  loadStudents();
+</script>
+</body>
+</html>
