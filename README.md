@@ -1,123 +1,153 @@
-# Student Management System v1
+<div align="center">
 
-A microservices-based RESTful API built with **Java 17 + Spring Boot 3 +
-Spring Cloud + Gradle**.
+<h1>🎓 Student Management System v1</h1>
 
-------------------------------------------------------------------------
+<p>A production-ready <strong>Microservices RESTful API</strong> built with Java 17, Spring Boot 3, Spring Cloud & Gradle</p>
 
-## Architecture
+<p>
+  <img src="https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
+  <img src="https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white" />
+  <img src="https://img.shields.io/badge/Spring_Cloud-2022.x-6DB33F?style=for-the-badge&logo=spring&logoColor=white" />
+  <img src="https://img.shields.io/badge/Gradle-8+-02303A?style=for-the-badge&logo=gradle&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+</p>
 
-    Browser / Postman
-            │
-            ▼
-      ┌──────────────┐    port 8080
-      │  API Gateway │  ◄──── All requests enter here
-      └──────┬───────┘
-             │  (routes /api/students → lb://student-service)
-             ▼
-      ┌────────────────┐   port 8081
-      │ Student Service│  ◄──── CRUD REST API
-      └──────┬─────────┘
-             │
-             ▼
-      ┌──────────────┐
-      │  H2 Database │  (in-memory; swap to MySQL for production)
-      └──────────────┘
+<p>
+  <img src="https://img.shields.io/badge/H2-In--Memory_DB-1C1C1C?style=for-the-badge&logo=databricks&logoColor=white" />
+  <img src="https://img.shields.io/badge/MySQL-Compatible-4479A1?style=for-the-badge&logo=mysql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Deployed_on-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" />
+</p>
 
-      ┌──────────────────┐   port 8761
-      │  Eureka Server   │  ◄──── Service Discovery
-      └──────────────────┘
+</div>
 
-------------------------------------------------------------------------
+---
 
-## Prerequisites
+## 📌 Overview
 
-  Tool      Version
-  --------- ---------
-  Java      17+
-  Gradle    8+
-  Postman   Any
+A scalable, cloud-ready **Student Management System** built using a microservices architecture. The system manages full CRUD operations for student records and is designed with service discovery, API routing, and containerization built in — ready for both local development and cloud deployment.
 
-*(Gradle Wrapper is included, so installing Gradle globally is
-optional.)*
+---
 
-------------------------------------------------------------------------
+## 🏗️ Architecture
 
-## How to Run
+```
+Browser / Postman
+      │
+      ▼
+┌──────────────┐  port 8080
+│  API Gateway │ ◄──── All external requests enter here
+└──────┬───────┘
+       │   (routes /api/students → lb://student-service)
+       ▼
+┌────────────────┐  port 8081
+│ Student Service│ ◄──── CRUD REST API
+└──────┬─────────┘
+       │
+       ▼
+┌──────────────┐
+│  H2 Database │  (in-memory; swap to MySQL for production)
+└──────────────┘
 
-Start services in the following order.
+┌──────────────────┐  port 8761
+│  Eureka Server   │ ◄──── Service Discovery
+└──────────────────┘
+```
 
-### 1. Start Eureka Server
+| Service | Role | Port |
+|---|---|---|
+| 🔍 Eureka Server | Service Discovery & Registry | `8761` |
+| 🌐 API Gateway | Request Routing & Load Balancing | `8080` |
+| 🎓 Student Service | Business Logic + CRUD API | `8081` |
+| 🗄️ H2 Console | In-Memory DB UI | `8081/h2-console` |
 
-    cd eureka-server
-    ./gradlew bootRun
+---
 
-Windows:
+## 🛠️ Tech Stack
 
-    gradlew bootRun
+| Layer | Technology |
+|---|---|
+| Language | Java 17 |
+| Framework | Spring Boot 3 |
+| Microservices | Spring Cloud (Eureka, Gateway) |
+| Build Tool | Gradle 8 |
+| Database | H2 (dev) / MySQL (prod) |
+| Containerization | Docker + Docker Compose |
+| Deployment | Render |
 
-Dashboard:
+---
 
-    http://localhost:8761
+## ✅ Prerequisites
 
-------------------------------------------------------------------------
+| Tool | Version |
+|---|---|
+| ☕ Java | 17+ |
+| 🐘 Gradle | 8+ *(or use included Gradle Wrapper)* |
+| 📮 Postman | Any |
+| 🐳 Docker | For containerized runs |
 
-### 2. Start API Gateway
+> **Note:** The Gradle Wrapper is bundled — no global Gradle install needed.
 
-    cd api-gateway
-    ./gradlew bootRun
+---
 
-Runs on:
+## 🚀 How to Run (Local)
 
-    http://localhost:8080
+Start services **in this order:**
 
-------------------------------------------------------------------------
+### 1️⃣ Eureka Server
+```bash
+cd eureka-server
+./gradlew bootRun          # macOS / Linux
+gradlew bootRun            # Windows
+```
+🌐 Dashboard: http://localhost:8761
 
-### 3. Start Student Service
+---
 
-    cd student-service
-    ./gradlew bootRun
+### 2️⃣ API Gateway
+```bash
+cd api-gateway
+./gradlew bootRun
+```
+🌐 Runs on: http://localhost:8080
 
-Runs on:
+---
 
-    http://localhost:8081
+### 3️⃣ Student Service
+```bash
+cd student-service
+./gradlew bootRun
+```
+🌐 API: http://localhost:8081  
+🗄️ H2 Console: http://localhost:8081/h2-console
 
-H2 Console:
+**H2 Connection Details:**
 
-    http://localhost:8081/h2-console
+| Property | Value |
+|---|---|
+| JDBC URL | `jdbc:h2:mem:studentsdb` |
+| Username | `sa` |
+| Password | *(leave empty)* |
 
-Connection:
+---
 
-  Property   Value
-  ---------- ------------------------
-  JDBC URL   jdbc:h2:mem:studentsdb
-  Username   sa
-  Password   (empty)
+## 📡 REST API Reference
 
-------------------------------------------------------------------------
+**Base URL:** `http://localhost:8080/api`
 
-## REST API
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/students` | Get all students |
+| `GET` | `/students/{id}` | Get student by ID |
+| `GET` | `/students/search?q=name` | Search students by name |
+| `POST` | `/students` | Create a new student |
+| `PUT` | `/students/{id}` | Update a student |
+| `DELETE` | `/students/{id}` | Delete a student |
 
-Base URL:
+### 📝 Example Request
 
-    http://localhost:8080/api
+**POST** `/api/students`
 
-  Method   Endpoint                  Description
-  -------- ------------------------- -------------------
-  GET      /students                 Get all students
-  GET      /students/{id}            Get student by id
-  GET      /students/search?q=name   Search students
-  POST     /students                 Create student
-  PUT      /students/{id}            Update student
-  DELETE   /students/{id}            Delete student
-
-------------------------------------------------------------------------
-
-## Example Request
-
-POST /api/students
-
-``` json
+```json
 {
   "name": "John Doe",
   "age": 21,
@@ -126,206 +156,129 @@ POST /api/students
 }
 ```
 
-------------------------------------------------------------------------
+---
 
-## Switch to MySQL
+## 🔄 Switch to MySQL (Production)
 
-Add dependency in `build.gradle`
-
-    runtimeOnly 'com.mysql:mysql-connector-j'
-
-Update `application.properties`
-
-    spring.datasource.url=jdbc:mysql://localhost:3306/studentsdb?createDatabaseIfNotExist=true
-    spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-    spring.datasource.username=root
-    spring.datasource.password=yourpassword
-
-    spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
-    spring.jpa.hibernate.ddl-auto=update
-
-------------------------------------------------------------------------
-
-# Docker Setup
-
-Each microservice can be containerized using Docker.
-
-## Build JAR Files
-
-Before building Docker images, build the services.
-
-```
-./gradlew clean build
+**1. Add dependency in `build.gradle`:**
+```groovy
+runtimeOnly 'com.mysql:mysql-connector-j'
 ```
 
-JAR will be generated inside
-
-```
-build/libs/
+**2. Update `application.properties`:**
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/studentsdb?createDatabaseIfNotExist=true
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+spring.jpa.hibernate.ddl-auto=update
 ```
 
 ---
 
-# Docker Compose (Recommended)
+## 🐳 Docker Setup
 
-Create `docker-compose.yml`
-
+### Build JAR Files
+```bash
+./gradlew clean build
+# JAR generated in: build/libs/
 ```
+
+### Docker Compose (Recommended)
+```yaml
 version: "3.8"
-
 services:
+  # eureka-server, api-gateway, student-service
 ```
 
-Run everything
-
-```
+```bash
 docker compose up --build
 ```
 
 ---
 
-# Deploying to Render
+## ☁️ Deploying to Render
 
-The services can be deployed individually on Render.
+### Step 1 — Push to GitHub
+Push your project repository to GitHub (e.g., `Student_Management_System_v1`).
 
-## Step 1 — Push Code to GitHub
+### Step 2 — Create a Render Account
+Visit [render.com](https://render.com) and log in with GitHub.
 
-Push your repository to GitHub.
+### Step 3 — Deploy Each Service
 
-Example
+**🔍 Eureka Server**
+| Config | Value |
+|---|---|
+| Name | `sms-eureka-server` |
+| Environment | Docker |
+| Root Directory | `eureka-server` |
+| Branch | `main` |
 
-```
-Student_Management_System_v1
-```
+**🎓 Student Service**
+| Config | Value |
+|---|---|
+| Name | `sms-student-service` |
+| Environment | Docker |
+| Root Directory | `student-service` |
+| Env Variable | `EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=https://sms-eureka-server.onrender.com/eureka/` |
 
----
+**🌐 API Gateway**
+| Config | Value |
+|---|---|
+| Name | `sms-api-gateway` |
+| Environment | Docker |
+| Root Directory | `api-gateway` |
+| Env Variable | `EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=https://sms-eureka-server.onrender.com/eureka/` |
 
-## Step 2 — Create Render Account
-
-Visit
-
-```
-https://render.com
-```
-
-Login with GitHub.
-
----
-
-# Deploy Eureka Server
-
-Create a new **Web Service**
-
-Configuration
-
-```
-Name: sms-eureka-server
-Environment: Docker
-Root Directory: eureka-server
-Branch: main
-```
-
-Deploy.
-
----
-
-# Deploy Student Service
-
-Create another **Web Service**
-
-Configuration
-
-```
-Name: sms-student-service
-Environment: Docker
-Root Directory: student-service
-Branch: main
-```
-
-Environment Variable
-
-```
-EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=https://sms-eureka-server.onrender.com/eureka/
-```
-
-Deploy.
-
----
-
-# Deploy API Gateway
-
-Create another **Web Service**
-
-Configuration
-
-```
-Name: sms-api-gateway
-Environment: Docker
-Root Directory: api-gateway
-Branch: main
-```
-
-Environment Variable
-
-```
-EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=https://sms-eureka-server.onrender.com/eureka/
-```
-
-Deploy.
-
----
-
-# Access the Application
-
-Once deployed, access APIs via gateway
-
+### 🌍 Live API URL
 ```
 https://sms-api-gateway.onrender.com/api/students
 ```
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
-    student-management-system
-    │
-    ├── eureka-server
-    │   ├── build.gradle
-    │   └── src/main/java/com/sms/eurekaserver
-    │
-    ├── api-gateway
-    │   ├── build.gradle
-    │   └── src/main/java/com/sms/apigateway
-    │
-    ├── student-service
-    │   ├── build.gradle
-    │   └── src/main/java/com/sms/studentservice
-    │       ├── controller
-    │       ├── service
-    │       ├── repository
-    │       ├── model
-    │       ├── dto
-    │       └── exception
-    │
-    └── frontend
-        └── index.html
-
-------------------------------------------------------------------------
-
-## Service Ports
-
-  Service           Port
-  ----------------- --------------------
-  Eureka Server     8761
-  API Gateway       8080
-  Student Service   8081
-  H2 Console        8081 (/h2-console)
+```
+student-management-system/
+│
+├── 📦 eureka-server/
+│   ├── build.gradle
+│   └── src/main/java/com/sms/eurekaserver/
+│
+├── 📦 api-gateway/
+│   ├── build.gradle
+│   └── src/main/java/com/sms/apigateway/
+│
+├── 📦 student-service/
+│   ├── build.gradle
+│   └── src/main/java/com/sms/studentservice/
+│       ├── controller/
+│       ├── service/
+│       ├── repository/
+│       ├── model/
+│       ├── dto/
+│       └── exception/
+│
+└── 🖥️ frontend/
+    └── index.html
+```
 
 ---
 
-# Future Improvements
+## 🔮 Future Improvements
 
-- Replace H2 with MySQL/PostgreSQL
-- Add authentication (JWT)
-- Implement CI/CD pipelines
-- Add monitoring (Prometheus + Grafana)
+- [ ] 🗄️ Replace H2 with MySQL / PostgreSQL
+- [ ] 🔐 Add Authentication (JWT)
+- [ ] ⚙️ Implement CI/CD Pipelines
+- [ ] 📊 Add Monitoring (Prometheus + Grafana)
+
+---
+
+<div align="center">
+
+Made with ❤️ using Java · Spring Boot · Spring Cloud
+
+</div>
