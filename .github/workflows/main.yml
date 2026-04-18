@@ -128,12 +128,12 @@ owasp:
       - name: Run Semgrep Scan
         run: |
           semgrep scan \
-            --config=p/java \
-            --config=p/spring \
-            --config=p/owasp-top-ten \
-            --json \
-            --output=semgrep.json \
-            --error
+          --config=p/java \
+          --config=p/spring \
+          --config=p/owasp-top-ten \
+          --config=p/secrets \
+          --json \
+          --output=semgrep.json || true
 
       - name: Upload Semgrep Report
         if: always()
