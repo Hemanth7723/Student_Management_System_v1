@@ -24,7 +24,6 @@ repositories {
 }
 
 dependencies {
-    failBuildOnCVSS = 10
 
     // Spring Web (REST APIs + embedded Tomcat)
     implementation 'org.springframework.boot:spring-boot-starter-web'
