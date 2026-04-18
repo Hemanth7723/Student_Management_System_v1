@@ -13,7 +13,7 @@ java {
 }
 
 ext {
-    set('springCloudVersion', "2025.0.0")
+    set('springCloudVersion', "2023.0.0")
 }
 
 repositories {
