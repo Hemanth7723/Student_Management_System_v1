@@ -32,7 +32,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/students")
-@CrossOrigin(origins = "*")          // Allow direct calls from the static HTML page
+// @CrossOrigin(origins = "*")          // Allow direct calls from the static HTML page
 public class StudentController {
 
     private final StudentService studentService;
